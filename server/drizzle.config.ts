@@ -1,5 +1,5 @@
-import type { Config } from 'drizzle-kit';
-import { env } from '@/env';
+import type { Config } from 'drizzle-kit'
+import { env } from '@/env'
 
 export default {
   dbCredentials: {
@@ -8,4 +8,4 @@ export default {
   dialect: 'postgresql',
   schema: 'src/infrastructure/db/schemas/*',
   out: 'src/infrastructure/db/migrations',
-} satisfies Config;
+} satisfies Config
