@@ -1,48 +1,71 @@
 {
-  "id": "fb90cac9-e146-414c-bdae-e391e3ef4a4d",
+  "id": "978cdb20-16cf-414b-a6ae-a9a9bf2f80f7",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.urls": {
-      "name": "urls",
+    "public.links": {
+      "name": "links",
       "schema": "",
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "text",
           "primaryKey": true,
-          "notNull": true
-        },
-        "short_code": {
-          "name": "short_code",
-          "type": "varchar(16)",
-          "primaryKey": false,
           "notNull": true
         },
         "original_url": {
           "name": "original_url",
-          "type": "varchar(2048)",
+          "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
         },
+        "short_url": {
+          "name": "short_url",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "clicks": {
+          "name": "clicks",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp with time zone",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_short_url": {
+          "name": "idx_short_url",
+          "columns": [
+            {
+              "expression": "short_url",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "urls_short_code_unique": {
-          "name": "urls_short_code_unique",
+        "links_short_url_unique": {
+          "name": "links_short_url_unique",
           "nullsNotDistinct": false,
           "columns": [
-            "short_code"
+            "short_url"
           ]
         }
       },
