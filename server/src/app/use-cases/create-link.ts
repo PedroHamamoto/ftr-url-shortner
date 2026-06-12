@@ -1,9 +1,8 @@
 import { Either, makeError, makeSuccess } from '@/shared/either'
 import { ShortUrlAlreadyExistsError } from './errors/short-url-already-exists'
 import { InvalidLinkInputError } from './errors/invalid-link-input'
-import { db } from '@/infrastructure/db'
-import { schema } from '@/infrastructure/db/schemas'
 import { Link } from '@/types/link'
+import { saveLink } from '@/infrastructure/db/repositories/link-repository'
 import z from 'zod'
 
 const createLinkInput = z.object({
@@ -37,29 +36,12 @@ export async function createLink(
         return makeError(new InvalidLinkInputError(messages))
     }
 
-    const [insertedLink] = await db
-        .insert(schema.links)
-        .values({
-            originalUrl: parsedInput.data.originalUrl,
-            shortUrl: parsedInput.data.shortUrl,
-        })
-        .onConflictDoNothing({
-            target: schema.links.shortUrl,
-        })
-        .returning()
+    const createdLink = await saveLink(parsedInput.data)
 
-    if (!insertedLink) {
+    if (!createdLink) {
         return makeError(new ShortUrlAlreadyExistsError())
     }
 
-    const link: Link = {
-        id: insertedLink.id as Link['id'],
-        originalUrl: insertedLink.originalUrl,
-        shortUrl: insertedLink.shortUrl,
-        clicks: insertedLink.clicks,
-        createdAt: insertedLink.createdAt,
-    }
-
-    return makeSuccess(link)
+    return makeSuccess(createdLink)
 
 }
