@@ -70,6 +70,31 @@ export async function findLinkById(id: string): Promise<Link | null> {
     }
 }
 
+export async function findLinkByShortUrl(shortUrl: string): Promise<Link | null> {
+    const [selectedLink] = await db
+        .select({
+            id: schema.links.id,
+            originalUrl: schema.links.originalUrl,
+            shortUrl: schema.links.shortUrl,
+            clicks: schema.links.clicks,
+            createdAt: schema.links.createdAt,
+        })
+        .from(schema.links)
+        .where(eq(schema.links.shortUrl, shortUrl))
+
+    if (!selectedLink) {
+        return null
+    }
+
+    return {
+        id: selectedLink.id as Link['id'],
+        originalUrl: selectedLink.originalUrl,
+        shortUrl: selectedLink.shortUrl,
+        clicks: selectedLink.clicks,
+        createdAt: selectedLink.createdAt,
+    }
+}
+
 export async function listLinks(
     input: ListLinksInput
 ): Promise<ListLinksOutput> {
