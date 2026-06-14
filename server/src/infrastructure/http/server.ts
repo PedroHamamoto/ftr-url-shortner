@@ -10,6 +10,9 @@ import {
 } from 'fastify-type-provider-zod'
 import { env } from '@/infrastructure/env'
 import { createLinkRoute } from './routes/create-link'
+import { deleteLinkByIdRoute } from './routes/delete-link-by-id'
+import { getLinkByShortUrlRoute } from './routes/get-link-by-short-url'
+import { listLinksRoute } from './routes/list-links'
 
 const server = fastify()
 
@@ -55,6 +58,9 @@ server.register(fastifySwaggerUi, {
 })
 server.register(async api => {
     api.register(createLinkRoute)
+    api.register(listLinksRoute)
+    api.register(getLinkByShortUrlRoute)
+    api.register(deleteLinkByIdRoute)
 }, {
     prefix: '/api/v1',
 })
