@@ -1,11 +1,21 @@
 import { db } from '@/infrastructure/db'
 import { schema } from '@/infrastructure/db/schemas'
 import { Link } from '@/types/link'
-import { eq } from 'drizzle-orm'
+import { count, desc, eq } from 'drizzle-orm'
 
 export type SaveLinkInput = {
     originalUrl: string
     shortUrl: string
+}
+
+export type ListLinksInput = {
+    page: number
+    pageSize: number
+}
+
+export type ListLinksOutput = {
+    links: Link[]
+    total: number
 }
 
 export async function saveLink(
@@ -57,6 +67,43 @@ export async function findLinkById(id: string): Promise<Link | null> {
         shortUrl: selectedLink.shortUrl,
         clicks: selectedLink.clicks,
         createdAt: selectedLink.createdAt,
+    }
+}
+
+export async function listLinks(
+    input: ListLinksInput
+): Promise<ListLinksOutput> {
+    const offset = (input.page - 1) * input.pageSize
+
+    const [selectedLinks, [{ total }]] = await Promise.all([
+        db
+            .select({
+                id: schema.links.id,
+                originalUrl: schema.links.originalUrl,
+                shortUrl: schema.links.shortUrl,
+                clicks: schema.links.clicks,
+                createdAt: schema.links.createdAt,
+            })
+            .from(schema.links)
+            .orderBy(desc(schema.links.createdAt))
+            .limit(input.pageSize)
+            .offset(offset),
+        db
+            .select({
+                total: count(),
+            })
+            .from(schema.links),
+    ])
+
+    return {
+        links: selectedLinks.map(selectedLink => ({
+            id: selectedLink.id as Link['id'],
+            originalUrl: selectedLink.originalUrl,
+            shortUrl: selectedLink.shortUrl,
+            clicks: selectedLink.clicks,
+            createdAt: selectedLink.createdAt,
+        })),
+        total,
     }
 }
 

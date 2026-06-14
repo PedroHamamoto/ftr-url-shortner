@@ -11,6 +11,7 @@ import {
 import { env } from '@/infrastructure/env'
 import { createLinkRoute } from './routes/create-link'
 import { deleteLinkByIdRoute } from './routes/delete-link-by-id'
+import { listLinksRoute } from './routes/list-links'
 
 const server = fastify()
 
@@ -56,6 +57,7 @@ server.register(fastifySwaggerUi, {
 })
 server.register(async api => {
     api.register(createLinkRoute)
+    api.register(listLinksRoute)
     api.register(deleteLinkByIdRoute)
 }, {
     prefix: '/api/v1',
