@@ -12,6 +12,7 @@ import { env } from '@/infrastructure/env'
 import { createLinkRoute } from './routes/create-link'
 import { deleteLinkByIdRoute } from './routes/delete-link-by-id'
 import { getLinkByShortUrlRoute } from './routes/get-link-by-short-url'
+import { incrementLinkClicksByIdRoute } from './routes/increment-link-clicks-by-id'
 import { listLinksRoute } from './routes/list-links'
 
 const server = fastify()
@@ -61,6 +62,7 @@ server.register(async api => {
     api.register(listLinksRoute)
     api.register(getLinkByShortUrlRoute)
     api.register(deleteLinkByIdRoute)
+    api.register(incrementLinkClicksByIdRoute)
 }, {
     prefix: '/api/v1',
 })
