@@ -1,7 +1,7 @@
 import { db } from '@/infrastructure/db'
 import { schema } from '@/infrastructure/db/schemas'
 import { Link } from '@/types/link'
-import { count, desc, eq } from 'drizzle-orm'
+import { count, desc, eq, sql } from 'drizzle-orm'
 
 export type SaveLinkInput = {
     originalUrl: string
@@ -139,4 +139,32 @@ export async function deleteLinkById(id: string): Promise<boolean> {
         .execute()
 
     return deleteResult.count > 0
+}
+
+export async function incrementLinkClicksById(id: string): Promise<Link | null> {
+    const [updatedLink] = await db
+        .update(schema.links)
+        .set({
+            clicks: sql`${schema.links.clicks} + 1`,
+        })
+        .where(eq(schema.links.id, id))
+        .returning({
+            id: schema.links.id,
+            originalUrl: schema.links.originalUrl,
+            shortUrl: schema.links.shortUrl,
+            clicks: schema.links.clicks,
+            createdAt: schema.links.createdAt,
+        })
+
+    if (!updatedLink) {
+        return null
+    }
+
+    return {
+        id: updatedLink.id as Link['id'],
+        originalUrl: updatedLink.originalUrl,
+        shortUrl: updatedLink.shortUrl,
+        clicks: updatedLink.clicks,
+        createdAt: updatedLink.createdAt,
+    }
 }
