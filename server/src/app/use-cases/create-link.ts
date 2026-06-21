@@ -7,12 +7,10 @@ import z from 'zod'
 
 const createLinkInput = z.object({
     originalUrl: z
-        .string()
-        .min(1, { message: 'originalUrl must not be empty.' })
-        .max(255, {
-            message: 'originalUrl must be at most 255 characters long.',
-        })
-        .url({ message: 'originalUrl must be a valid URL.' }),
+        .url({ message: 'originalUrl must be a valid URL. 1' })
+        .refine(url => url.startsWith('http://') || url.startsWith('https://'), {
+            message: 'originalUrl must be an URL with http:// or https:// scheme.',
+        }),
     shortUrl: z
         .string()
         .min(1, { message: 'shortUrl must not be empty.' })
