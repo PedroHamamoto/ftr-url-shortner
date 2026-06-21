@@ -8,17 +8,19 @@ import { r2 } from './client'
 const uploadFileToStorageInput = z.object({
     contentType: z.string(),
     contentStream: z.instanceof(Readable),
+    folder: z.string(),
+    filename: z.string(),
 })
 
 type UploadFileToStorageInput = z.input<typeof uploadFileToStorageInput>
 
 export async function uploadFileToStorage(input: UploadFileToStorageInput) {
-    const { contentType, contentStream } =
+    const { contentType, contentStream, folder, filename } =
         uploadFileToStorageInput.parse(input)
 
     const now = new Date()
     const dateFormat = now.toISOString().slice(0, 10)
-    const uniqueFileName = `exports/${dateFormat}-${randomUUID()}-links.csv`
+    const uniqueFileName = `${folder}/${dateFormat}-${randomUUID()}-${filename}`
 
     const upload = new Upload({
         client: r2,

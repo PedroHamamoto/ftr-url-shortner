@@ -1,4 +1,5 @@
-import { db } from '@/infrastructure/db'
+import { Readable } from 'node:stream'
+import { db, pg } from '@/infrastructure/db'
 import { schema } from '@/infrastructure/db/schemas'
 import { Link } from '@/types/link'
 import { count, desc, eq, sql } from 'drizzle-orm'
@@ -167,4 +168,37 @@ export async function incrementLinkClicksById(id: string): Promise<Link | null> 
         clicks: updatedLink.clicks,
         createdAt: updatedLink.createdAt,
     }
+}
+
+export async function getAllLinksAsStream(): Promise<Readable> {
+    const { sql: sqlQuery, params } = db
+        .select({
+            id: schema.links.id,
+            originalUrl: schema.links.originalUrl,
+            shortUrl: schema.links.shortUrl,
+            clicks: schema.links.clicks,
+            createdAt: schema.links.createdAt,
+        })
+        .from(schema.links)
+        .orderBy(desc(schema.links.createdAt))
+        .toSQL()
+
+    const cursor = pg.unsafe(sqlQuery, params as string[]).cursor(50)
+
+    const mappedCursor = (async function* () {
+        for await (const batch of cursor) {
+            for (const row of batch) {
+                const rowRecord = row as unknown as Record<string, unknown>
+                yield {
+                    id: rowRecord.id as string,
+                    originalUrl: rowRecord.original_url as string,
+                    shortUrl: rowRecord.short_url as string,
+                    clicks: rowRecord.clicks as number,
+                    createdAt: rowRecord.created_at as Date,
+                }
+            }
+        }
+    })()
+
+    return Readable.from(mappedCursor)
 }
