@@ -16,8 +16,9 @@ const createLinkInput = z.object({
     shortUrl: z
         .string()
         .min(1, { message: 'shortUrl must not be empty.' })
-        .regex(/^[a-z0-9-]+$/, {
-            message: 'shortUrl must match ^[a-z0-9-]+$.',
+        .max(20, { message: 'shortUrl must be at most 20 characters long.' })
+        .regex(/^[a-z0-9]+$/, {
+            message: 'shortUrl must have only alphanumeric characters.',
         }),
 })
 

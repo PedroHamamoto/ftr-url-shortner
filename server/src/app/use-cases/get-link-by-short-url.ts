@@ -9,7 +9,7 @@ const getLinkByShortUrlInputSchema = z.object({
     shortUrl: z
         .string()
         .min(1, { message: 'shortUrl must not be empty.' })
-        .regex(/^[a-z0-9-]+$/, {
+        .regex(/^[a-z0-9]+$/, {
             message: 'shortUrl must match ^[a-z0-9-]+$.',
         }),
 })

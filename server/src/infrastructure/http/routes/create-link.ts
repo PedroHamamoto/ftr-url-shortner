@@ -17,7 +17,7 @@ const createLinkBodySchema = z
         originalUrl: z.string().describe('Destination URL to be shortened.'),
         shortUrl: z
             .string()
-            .describe('Custom short slug. Allowed pattern: ^[a-z0-9-]+$'),
+            .describe('Custom short slug for the URL. Must be unique and contain only alphanumeric characters.'),
     })
     .describe('Payload for creating a short link.')
     .meta({
@@ -42,7 +42,7 @@ const unprocessableEntitySchema = messageWithErrorsSchema
             message: 'Invalid link input.',
             errors: [
                 'originalUrl must be a valid URL.',
-                'shortUrl must match ^[a-z0-9-]+$.',
+                'shortUrl must have only alphanumeric characters.',
             ],
         },
     })
